@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -390,10 +391,18 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     }
 
     private void openCustomMediaPicker(final Activity activity) {
+        Set<MimeType> mimeType;
+        if (cropping || mediaType.equals("photo")) {
+            mimeType = MimeType.ofImage();
+        } else if (mediaType.equals("video")) {
+            mimeType = MimeType.ofVideo();
+        } else {
+            mimeType = MimeType.ofAll();
+        }
         Matisse.from(activity)
-                .choose(MimeType.ofAll(), false)
+                .choose(mimeType, false)
                 .countable(true)
-                .maxSelectable(maxFiles)
+                .maxSelectable(multiple ? maxFiles : 1)
                 .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 .thumbnailScale(0.85f)
                 .imageEngine(new GlideEngine())
@@ -716,9 +725,13 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             if (!useStockGallery) {
                 try {
                     List<Uri> selectedItems = Matisse.obtainResult(data);
-                    resultCollector.setWaitCount(selectedItems.size());
-                    for (int i = 0; i < selectedItems.size(); i++) {
-                        getAsyncSelection(activity, selectedItems.get(i), false);
+                    if (multiple || !cropping) {
+                        resultCollector.setWaitCount(selectedItems.size());
+                        for (int i = 0; i < selectedItems.size(); i++) {
+                            getAsyncSelection(activity, selectedItems.get(i), false);
+                        }
+                    } else if (selectedItems.size() > 0){
+                        startCropping(activity, selectedItems.get(0));
                     }
                 } catch (Exception ex) {
                     resultCollector.notifyProblem(E_NO_IMAGE_DATA_FOUND, ex.getMessage());
