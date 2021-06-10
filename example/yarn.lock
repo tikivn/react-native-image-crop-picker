@@ -911,6 +911,11 @@
     wcwidth "^1.0.1"
     ws "^1.1.0"
 
+"@tikivn/react-native-image-crop-picker@0.36.3":
+  version "0.36.3"
+  resolved "https://npm.pkg.github.com/download/@tikivn/react-native-image-crop-picker/0.36.3/e671ee3845d2c28b92bd0dbef4af31e2d4704b5d8e6ecc3611a93a4b5561dfb3#6de4b8ff0751c64b8f0f35f5b898f54ccc118000"
+  integrity sha512-wUQXQLtdFcbu9XcoiYl1KNlo8UGQXfoLwLkY/PSzaiMG17l7k8nT/UdA/N85OSLWb2UB7zLrL181RznGwy2JtQ==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
@@ -3845,9 +3850,6 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
-
-react-native-image-crop-picker@../:
-  version "0.32.2"
 
 react-native-video@5.1.0-alpha1:
   version "5.1.0-alpha1"
