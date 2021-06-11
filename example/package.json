@@ -10,7 +10,7 @@
   "dependencies": {
     "react": "16.10.2",
     "react-native": "0.61.2",
-    "@tikivn/react-native-image-crop-picker": "0.36.3",
+    "@tikivn/react-native-image-crop-picker": "^0.36.3",
     "react-native-video": "5.1.0-alpha1"
   },
   "devDependencies": {
