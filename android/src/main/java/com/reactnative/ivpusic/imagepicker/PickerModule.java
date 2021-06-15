@@ -457,6 +457,32 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         });
     }
 
+    @ReactMethod
+    public void compressImage(final ReadableMap options, final Promise promise) {
+        final Activity activity = getCurrentActivity();
+
+        if (activity == null) {
+            promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
+            return;
+        }
+
+        setConfiguration(options);
+        resultCollector.setup(promise, false);
+
+        final Uri uri = Uri.parse(options.getString("path"));
+        permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
+            @Override
+            public Void call() {
+                try {
+                   promise.resolve(doCompress(uri.getPath()));
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+                return null;
+            }
+        });
+    }
+
     private String getBase64StringFromFile(String absoluteFilePath) {
         InputStream inputStream;
 
@@ -891,5 +917,15 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         map.putInt("height", data.getIntExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, DEFAULT_VALUE));
 
         return map;
+    }
+
+    private String doCompress(String path) throws Exception {
+        if (path.startsWith("http://") || path.startsWith("https://")) {
+            throw new Exception("Cannot select remote files");
+        }
+        BitmapFactory.Options original = validateImage(path);
+        File compressedImage = compression.compressImage(this.reactContext, options, path, original);
+        String compressedImagePath = compressedImage.getPath();
+        return "file://" + compressedImagePath;
     }
 }

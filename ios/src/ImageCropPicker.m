@@ -380,6 +380,26 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
     }];
 }
 
+RCT_EXPORT_METHOD(compressImage:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    
+    [self setConfiguration:options resolver:resolve rejecter:reject];
+    self.currentSelectionMode = CROPPING;
+    
+    NSString *path = [options objectForKey:@"path"];
+    
+    [[self.bridge moduleForName:@"ImageLoader" lazilyLoadIfNecessary:YES] loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
+        if (error) {
+            self.reject(ERROR_CROPPER_IMAGE_NOT_FOUND_KEY, ERROR_CROPPER_IMAGE_NOT_FOUND_MSG, nil);
+        } else {
+            ImageResult *imageResult = [self.compression compressImage:[image fixOrientation]  withOptions:self.options];
+            NSString *filePath = [self persistFile:imageResult.data];
+            self.resolve(filePath);
+        }
+    }];
+}
+
 - (void)showActivityIndicator:(void (^)(UIActivityIndicatorView*, UIView*))handler {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIView *mainView = [[self getRootVC] view];

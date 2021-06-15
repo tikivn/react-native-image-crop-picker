@@ -911,10 +911,8 @@
     wcwidth "^1.0.1"
     ws "^1.1.0"
 
-"@tikivn/react-native-image-crop-picker@^0.36.3":
-  version "0.36.6"
-  resolved "https://npm.pkg.github.com/download/@tikivn/react-native-image-crop-picker/0.36.6/1747d7e0ee031babe5b5f9d6a462eb8c8329f63d67c78dde7a00f0c26fa20cb8#133c89c2f26c6263e8a81d6d51a39f625c07685b"
-  integrity sha512-PBh/oOHV1HLkFDLKJugrYZ6PRVxE8Nmfp/HDRYRhhYuA3DTbFqxyAwCjWtCodgOxWb8tqaa2Xgh4sg4K2cvJEw==
+"@tikivn/react-native-image-crop-picker@../":
+  version "0.36.8"
 
 "@types/color-name@^1.1.1":
   version "1.1.1"

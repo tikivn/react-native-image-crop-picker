@@ -199,7 +199,31 @@ export default class App extends Component {
       })
       .catch((e) => alert(e));
   }
-
+  compressImage() {
+    if (!this.state.image) {
+      return Alert.alert(
+        "No image",
+        "Before open cropping only, please select image"
+      );
+    }
+    console.log("path", this.state.image.uri);
+    ImagePicker.compressImage({
+      path: this.state.image.uri,
+      compressImageQuality: 0.2,
+    })
+      .then((path) => {
+        this.setState({
+          image: {
+            uri: path,
+            width: this.state.image.width,
+            height: this.state.image.height,
+            mime: this.state.image.mime,
+          },
+          images: null,
+        });
+      })
+      .catch((e) => alert(e));
+  }
   scaledHeight(oldW, oldH, newW) {
     return (oldH / oldW) * newW;
   }
@@ -319,6 +343,12 @@ export default class App extends Component {
           style={styles.button}
         >
           <Text style={styles.text}>Cleanup Single Image</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.compressImage.bind(this)}
+          style={styles.button}
+        >
+          <Text style={styles.text}>Compress image</Text>
         </TouchableOpacity>
       </View>
     );
