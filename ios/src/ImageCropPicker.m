@@ -71,7 +71,8 @@ RCT_EXPORT_MODULE();
             @"forceJpg": @NO,
             @"sortOrder": @"none",
             @"cropperCancelText": @"Cancel",
-            @"cropperChooseText": @"Choose"
+            @"cropperChooseText": @"Choose",
+            @"videoLimitDuration": @0
         };
         self.compression = [[Compression alloc] init];
     }
@@ -164,6 +165,10 @@ RCT_EXPORT_METHOD(openCamera:(NSDictionary *)options
                 if ([availableTypes containsObject:(NSString *)kUTTypeMovie]) {
                     picker.mediaTypes = [[NSArray alloc] initWithObjects:(NSString *)kUTTypeMovie, nil];
                     picker.videoQuality = UIImagePickerControllerQualityTypeHigh;
+                    int videoLimitDuration = [[self.options objectForKey:@"videoLimitDuration"] intValue];
+                    if (videoLimitDuration > 0) {
+                        picker.videoMaximumDuration = videoLimitDuration;
+                    }
                 }
             }
             
