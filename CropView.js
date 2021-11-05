@@ -1,14 +1,11 @@
 import React, { createRef } from "react";
 import {
   findNodeHandle,
-  NativeSyntheticEvent,
   requireNativeComponent,
-  StyleProp,
   UIManager,
-  ViewStyle,
 } from "react-native";
 
-const RCTCropView = requireNativeComponent("CropView");
+const RCTCropView = requireNativeComponent("RCTCropView");
 
 class CropView extends React.PureComponent {
   static defaultProps = {
@@ -20,7 +17,7 @@ class CropView extends React.PureComponent {
   saveImage = (preserveTransparency = true, quality = 90) => {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.viewRef.current),
-      UIManager.getViewManagerConfig("CropView").Commands.saveImage,
+      UIManager.getViewManagerConfig("RCTCropView").Commands.saveImage,
       [preserveTransparency, quality]
     );
   };
@@ -28,7 +25,7 @@ class CropView extends React.PureComponent {
   rotateImage = (clockwise = true) => {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.viewRef.current),
-      UIManager.getViewManagerConfig("CropView").Commands.rotateImage,
+      UIManager.getViewManagerConfig("RCTCropView").Commands.rotateImage,
       [clockwise]
     );
   };
