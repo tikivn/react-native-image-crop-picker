@@ -71,6 +71,15 @@
     return _inlineCropView.aspectRatio;
 }
 
+- (void)setSourceUrl:(NSString *)sourceUrl {
+    if (_inlineCropView) {
+        [_inlineCropView removeFromSuperview];
+        _inlineCropView = nil;
+    }
+    self->sourceUrl = sourceUrl;
+    [self layoutIfNeeded];
+}
+
 - (void)setKeepAspectRatio:(BOOL)keepAspectRatio {
     if (_inlineCropView) {
         _inlineCropView.aspectRatioLockEnabled = keepAspectRatio;

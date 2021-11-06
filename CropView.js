@@ -43,7 +43,7 @@ class CropView extends React.PureComponent {
           onImageCrop(event.nativeEvent);
         }}
         keepAspectRatio={keepAspectRatio}
-        cropAspectRatio={1}
+        cropAspectRatio={aspectRatio}
       />
     );
   }
