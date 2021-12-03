@@ -495,7 +495,7 @@ declare module "react-native-image-crop-picker" {
   export function openCropper(options: CropperOptions): Promise<Image>;
   export function cropImageToRect(
     options: CropperToRectOptions
-  ): Promise<Image>;
+  ): Promise<string>;
   export function clean(): Promise<void>;
   export function cleanSingle(path: string): Promise<void>;
 
