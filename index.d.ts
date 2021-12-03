@@ -327,6 +327,17 @@ declare module "react-native-image-crop-picker" {
     path: string;
   };
 
+  type Rect = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+
+  type CropperToRectOptions = CropperOptions & {
+    cropperRect: Rect;
+  };
+
   type VideoOptions = CommonOptions & {
     mediaType: "video";
 
@@ -482,6 +493,9 @@ declare module "react-native-image-crop-picker" {
     options: O
   ): Promise<PossibleArray<O, MediaType<O>>>;
   export function openCropper(options: CropperOptions): Promise<Image>;
+  export function cropImageToRect(
+    options: CropperToRectOptions
+  ): Promise<Image>;
   export function clean(): Promise<void>;
   export function cleanSingle(path: string): Promise<void>;
 
@@ -495,6 +509,7 @@ declare module "react-native-image-crop-picker" {
     openCropper(options: CropperOptions): Promise<Image>;
     clean(): Promise<void>;
     cleanSingle(path: string): Promise<void>;
+    openCropper(options: CropperToRectOptions): Promise<string>;
   }
 
   export interface CropSize {
