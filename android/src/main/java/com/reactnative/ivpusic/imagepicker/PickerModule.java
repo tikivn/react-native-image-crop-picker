@@ -10,14 +10,18 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.RectF;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.webkit.MimeTypeMap;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
@@ -35,6 +39,12 @@ import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.UCropActivity;
+import com.yalantis.ucrop.callback.BitmapCropCallback;
+import com.yalantis.ucrop.model.CropParameters;
+import com.yalantis.ucrop.model.ExifInfo;
+import com.yalantis.ucrop.model.ImageState;
+import com.yalantis.ucrop.task.BitmapCropTask;
+import com.yalantis.ucrop.util.BitmapLoadUtils;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
@@ -92,6 +102,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private boolean disableCropperColorSetters = false;
     private boolean useFrontCamera = false;
     private int videoLimitDuration = -1;
+    private ReadableMap cropperRect;
     private ReadableMap options;
 
     private String cropperActiveWidgetColor = null;
@@ -152,6 +163,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         disableCropperColorSetters = options.hasKey("disableCropperColorSetters") && options.getBoolean("disableCropperColorSetters");
         useFrontCamera = options.hasKey("useFrontCamera") && options.getBoolean("useFrontCamera");
         videoLimitDuration = options.hasKey("videoLimitDuration") ? options.getInt("videoLimitDuration") : 0;
+        cropperRect = options.hasKey("cropperRect") ? options.getMap("cropperRect") : null;
+
         this.options = options;
     }
 
@@ -480,6 +493,66 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             public Void call() {
                 try {
                    promise.resolve(doCompress(uri.getPath()));
+                } catch (Exception e) {
+                    promise.reject(e);
+                }
+                return null;
+            }
+        });
+    }
+
+    @ReactMethod
+    public void cropImageToRect(final ReadableMap options, final Promise promise) {
+        final Activity activity = getCurrentActivity();
+
+        if (activity == null) {
+            promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
+            return;
+        }
+
+        setConfiguration(options);
+        resultCollector.setup(promise, false);
+
+        final Uri uri = Uri.parse(options.getString("path"));
+        if (this.cropperRect == null) {
+            promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Cropper rect was not set");
+            return;
+        }
+        float x = this.cropperRect.hasKey("x") ? (float) this.cropperRect.getDouble("x") : 0;
+        float y = this.cropperRect.hasKey("y") ? (float) this.cropperRect.getDouble("y") : 0;
+        float width = this.cropperRect.hasKey("width") ? (float) this.cropperRect.getDouble("width") : 0;
+        float height = this.cropperRect.hasKey("height") ? (float) this.cropperRect.getDouble("height") : 0;
+        final RectF cropRect = new RectF(x, y,  x + width, y + height);
+        final Bitmap bitmap = BitmapFactory.decodeFile(uri.getPath());
+        final RectF currentRect = new RectF(0, 0,  bitmap.getWidth(),  bitmap.getHeight());
+        permissionsCheck(activity, promise, Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
+            @Override
+            public Void call() {
+                try {
+                    final String outputPath = getTmpDir(activity) + "/" + UUID.randomUUID().toString() + ".jpg";
+
+                    ExifInterface originalExif = new ExifInterface(uri.getPath());
+                    int exifOrientation = originalExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                    int exifDegrees = BitmapLoadUtils.exifToDegrees(exifOrientation);
+                    int exifTranslation = BitmapLoadUtils.exifToTranslation(exifOrientation);
+                    ExifInfo exifInfo = new ExifInfo(exifOrientation,exifDegrees , exifTranslation);
+
+                    final CropParameters cropParameters = new CropParameters(
+                            (int)currentRect.width(), (int)currentRect.height(),
+                            Bitmap.CompressFormat.JPEG, 100,
+                            uri.getPath(), outputPath, exifInfo);
+                    BitmapCropTask cropTask = new BitmapCropTask(bitmap, new ImageState(cropRect, currentRect, 1, 0), cropParameters, new BitmapCropCallback() {
+                        @Override
+                        public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
+                            promise.resolve("file://" + resultUri.getPath());
+                        }
+
+                        @Override
+                        public void onCropFailure(@NonNull Throwable t) {
+                            promise.reject(t);
+                        }
+                    });
+                    cropTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 } catch (Exception e) {
                     promise.reject(e);
                 }

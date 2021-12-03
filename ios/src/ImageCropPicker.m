@@ -8,6 +8,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 
 #import "ImageCropPicker.h"
+#import <CropViewController/UIImage+CropRotate.h>
 
 #define ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_KEY @"E_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR"
 #define ERROR_PICKER_CANNOT_RUN_CAMERA_ON_SIMULATOR_MSG @"Cannot run camera on simulator"
@@ -72,7 +73,8 @@ RCT_EXPORT_MODULE();
             @"sortOrder": @"none",
             @"cropperCancelText": @"Cancel",
             @"cropperChooseText": @"Choose",
-            @"videoLimitDuration": @0
+            @"videoLimitDuration": @0,
+            @"cropperRect": @{},
         };
         self.compression = [[Compression alloc] init];
     }
@@ -400,6 +402,28 @@ RCT_EXPORT_METHOD(compressImage:(NSDictionary *)options
         } else {
             ImageResult *imageResult = [self.compression compressImage:[image fixOrientation]  withOptions:self.options];
             NSString *filePath = [self persistFile:imageResult.data];
+            self.resolve(filePath);
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(cropImageToRect:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    
+    [self setConfiguration:options resolver:resolve rejecter:reject];
+    
+    NSString *path = [options objectForKey:@"path"];
+    NSDictionary *cropperRectDict = [options objectForKey:@"cropperRect"];
+    CGRect cropRect = [ImageCropPicker dictionaryToCGRect:cropperRectDict];
+    
+    [[self.bridge moduleForName:@"ImageLoader" lazilyLoadIfNecessary:YES] loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
+        if (error) {
+            self.reject(ERROR_CROPPER_IMAGE_NOT_FOUND_KEY, ERROR_CROPPER_IMAGE_NOT_FOUND_MSG, nil);
+        } else {
+            UIImage *imageResult = [[image fixOrientation] croppedImageWithFrame:cropRect angle:0 circularClip:NO];
+            NSData *data = UIImageJPEGRepresentation(imageResult, 1.0);
+            NSString *filePath = [self persistFile:data];
             self.resolve(filePath);
         }
     }];
@@ -889,6 +913,11 @@ RCT_EXPORT_METHOD(compressImage:(NSDictionary *)options
         @"height": [NSNumber numberWithFloat: CGRectGetHeight(rect)]
     };
 }
+
++ (CGRect)dictionaryToCGRect:(NSDictionary *)dict {
+    return CGRectMake([dict[@"x"] floatValue], [dict[@"y"] floatValue], [dict[@"width"] floatValue], [dict[@"height"] floatValue]);
+}
+
 
 #pragma mark - TOCCropViewController Implementation
 - (void)cropImage:(UIImage *)image {
