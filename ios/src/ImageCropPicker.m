@@ -515,7 +515,7 @@ RCT_EXPORT_METHOD(cropImageToRect:(NSDictionary *)options
                               error:nil];
         CMTime time = [asset duration];
         int milliseconds = ceil(time.value/time.timescale) * 1000;
-        NSString *mime = [NSString stringWithFormat:@"video/%@", [[(AVURLAsset *)asset URL] pathExtension]];
+        NSString *mime = [NSString stringWithFormat:@"video/%@", [[[(AVURLAsset *)asset URL] pathExtension] lowercaseString]];
         completion([self createAttachmentResponse:nil
                                          withExif:nil
                                     withSourceURL:[sourceURL absoluteString]
