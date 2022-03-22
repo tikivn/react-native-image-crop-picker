@@ -7,6 +7,7 @@
 //
 
 #import "Compression.h"
+@import Photos;
 
 @implementation Compression
 
@@ -106,7 +107,6 @@
             outputURL:(NSURL*)outputURL
           withOptions:(NSDictionary*)options
               handler:(void (^)(AVAssetExportSession*))handler {
-    
     NSString *presetKey = [options valueForKey:@"compressVideoPreset"];
     if (presetKey == nil) {
         presetKey = @"MediumQuality";
@@ -129,4 +129,36 @@
     }];
 }
 
+- (void) convertStringToURL:(NSString*)source handler:(void (^)(NSURL*))handler {
+    if([source containsString:@"ph://"]){
+        NSString *assetIdentifier = [source stringByReplacingOccurrencesOfString: @"ph://" withString: @""];
+        PHFetchResult *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers: @[assetIdentifier] options:nil];
+        PHAsset *phAsset = [assetResult firstObject];
+        if(phAsset == nil || phAsset.mediaType != PHAssetMediaTypeVideo){
+            [self exception:@"Failed to request asset."];
+        }
+        PHImageManager *manager = [PHImageManager defaultManager];
+        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+        options.version = PHVideoRequestOptionsVersionOriginal;
+        options.networkAccessAllowed = YES;
+        options.deliveryMode = PHVideoRequestOptionsDeliveryModeHighQualityFormat;
+        
+        [manager
+         requestAVAssetForVideo:phAsset
+         options:options
+         resultHandler:^(AVAsset * asset, AVAudioMix * audioMix,
+                         NSDictionary *info) {
+            handler([(AVURLAsset *)asset URL]);
+        }];
+    }else if ([source containsString:@"assets-library"]){
+        handler([NSURL fileURLWithPath:source]);
+    } else {
+        NSURL *bundleURL = [[NSBundle mainBundle] bundleURL];
+        handler([NSURL URLWithString:source relativeToURL: bundleURL]);
+    }
+}
+
+- (void) exception:(NSString*)error {
+    @throw [NSException exceptionWithName:@"" reason: error userInfo:nil];
+}
 @end

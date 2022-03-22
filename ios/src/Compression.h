@@ -32,6 +32,8 @@
           withOptions:(NSDictionary*)options
               handler:(void (^)(AVAssetExportSession*))handler;
 
+- (void)convertStringToURL:(NSString*)source handler:(void (^)(NSURL*))handler;
+
 @property NSDictionary *exportPresets;
 
 @end
