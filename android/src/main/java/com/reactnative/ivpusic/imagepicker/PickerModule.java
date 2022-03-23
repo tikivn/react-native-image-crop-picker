@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.PromiseImpl;
@@ -506,7 +508,6 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
   @ReactMethod
   public void compressVideo(final ReadableMap options, final Promise promise) {
     final Activity activity = getCurrentActivity();
-
     if (activity == null) {
       promise.reject(E_ACTIVITY_DOES_NOT_EXIST, "Activity doesn't exist");
       return;
@@ -517,7 +518,6 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     try {
       final String path = String.valueOf(Uri.parse(options.getString("path")));
-      validateVideo(path);
       final String compressedVideoPath = getTmpDir(activity) + "/" + UUID.randomUUID().toString() + ".mp4";
       final Context context = this.reactContext;
 
@@ -529,19 +529,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             public void invoke(Object... args) {
               try {
                 String videoPath = (String) args[0];
-                Bitmap bmp = validateVideo(videoPath);
-                long modificationDate = new File(videoPath).lastModified();
-                long duration = getVideoDuration(videoPath);
-
-                WritableMap video = new WritableNativeMap();
-                video.putInt("width", bmp.getWidth());
-                video.putInt("height", bmp.getHeight());
-                video.putInt("size", (int) new File(videoPath).length());
-                video.putInt("duration", (int) duration);
-                video.putString("path", "file://" + videoPath);
-                video.putString("modificationDate", String.valueOf(modificationDate));
-
-                promise.resolve(video);
+                promise.resolve("file://" + videoPath);
               } catch (Exception e) {
                 promise.reject(e);
               }

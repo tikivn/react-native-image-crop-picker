@@ -480,7 +480,6 @@ RCT_EXPORT_METHOD(compressVideo:(NSDictionary *)options
             NSURL *outputURL = [NSURL fileURLWithPath:filePath];
             
             [self.compression compressVideo:inputputURL outputURL:outputURL withOptions:self.options handler:^(AVAssetExportSession *exportSession) {
-                NSLog(@"mai.nguyen: %i",exportSession.status);
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
                    resolve(outputURL.absoluteString);
                 }
