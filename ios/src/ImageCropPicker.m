@@ -465,6 +465,33 @@ RCT_EXPORT_METHOD(cropImageToRect:(NSDictionary *)options
     });
 }
 
+RCT_EXPORT_METHOD(compressVideo:(NSDictionary *)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    @try
+    {
+        [self setConfiguration:options resolver:resolve rejecter:reject];
+        NSString *path = [options objectForKey:@"path"];
+
+        [self.compression convertStringToURL:path handler:^(NSURL *inputputURL) {
+            NSString *tmpDirFullPath = [self getTmpDirectory];
+            NSString *filePath = [tmpDirFullPath stringByAppendingString:[[NSUUID UUID] UUIDString]];
+            filePath = [filePath stringByAppendingString:@".mp4"];
+            NSURL *outputURL = [NSURL fileURLWithPath:filePath];
+            
+            [self.compression compressVideo:inputputURL outputURL:outputURL withOptions:self.options handler:^(AVAssetExportSession *exportSession) {
+                if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                   resolve(outputURL.absoluteString);
+                }
+            }];
+        }];
+    }
+    @catch(NSException * e) {
+        self.reject(ERROR_CANNOT_PROCESS_VIDEO_KEY, e.reason, nil);
+    }
+    
+}
+
 - (void) handleVideo:(AVAsset*)asset withFileName:(NSString*)fileName withLocalIdentifier:(NSString*)localIdentifier completion:(void (^)(NSDictionary* image))completion {
     NSURL *sourceURL = [(AVURLAsset *)asset URL];
     
