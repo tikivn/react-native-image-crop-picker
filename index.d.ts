@@ -272,21 +272,44 @@ declare module "react-native-image-crop-picker" {
      */
     showCropGuidelines?: boolean;
 
-    /**
-     * Whether to show the square crop frame during cropping
-     *
-     * @platform Android only
-     * @default true
-     */
-    showCropFrame?: boolean;
+        /**
+         * Cancel button color. HEX-like string color.
+         *
+         * @example '#ff00ee'
+         * @platform iOS only
+         */
+        cropperCancelColor?: string;
 
-    /**
-     * Whether to enable rotating the image by hand gesture.
-     *
-     * @platform Android only
-     * @default false
-     */
-    enableRotationGesture?: boolean;
+        /**
+         * Choose button text.
+         *
+         * @default 'Choose'
+         */
+        cropperChooseText?: string;
+
+        /**
+         * Choose button color. HEX-like string color.
+         *
+         * @example '#EE00DD'
+         * @platform iOS only
+         */
+        cropperChooseColor?: string;
+
+         /**
+         * Enable or disable cropper rotate buttons.
+         *
+         * @platform iOS only
+         * @default false
+         */
+          cropperRotateButtonsHidden?: boolean
+
+        /**
+         * Whether to show the 3x3 grid on top of the image during cropping.
+         *
+         * @platform Android only
+         * @default true
+         */
+        showCropGuidelines?: boolean;
 
     /**
      * When cropping image, disables the color setters for cropping library.
@@ -388,12 +411,10 @@ declare module "react-native-image-crop-picker" {
      */
     exif?: null | object;
 
-    /**
-     * Selected image's localidentifier, used for PHAsset searching.
-     *
-     * @platform iOS only
-     */
-    localIdentifier?: string;
+        /**
+         * Extracted exif data from image. Response format is platform specific.
+         */
+        exif?: any;
 
     /**
      * Selected image's source path, do not have write access.
