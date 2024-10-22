@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "8.0"
   s.dependency 'React-Core'
   s.dependency 'React-RCTImage'
+  s.dependency 'CropViewController'
 
   s.resource_bundles = {
     'RNImageCropPickerPrivacyInfo' => ['ios/PrivacyInfo.xcprivacy'],
