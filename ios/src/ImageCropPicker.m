@@ -75,6 +75,7 @@ RCT_EXPORT_MODULE();
             @"cropperChooseText": @"Choose",
             @"videoLimitDuration": @0,
             @"cropperRect": @{},
+            @"cropperRotateButtonsHidden": @NO
         };
         self.compression = [[Compression alloc] init];
     }
@@ -997,11 +998,25 @@ RCT_EXPORT_METHOD(compressVideo:(NSDictionary *)options
         
         cropVC.title = [[self options] objectForKey:@"cropperToolbarTitle"];
         cropVC.delegate = self;
+
+        NSString* rawDoneButtonColor = [self.options objectForKey:@"cropperChooseColor"];
+        NSString* rawCancelButtonColor = [self.options objectForKey:@"cropperCancelColor"];
+
+        if (rawDoneButtonColor) {
+            cropVC.doneButtonColor = [ImageCropPicker colorFromHexString: rawDoneButtonColor];
+        }
+        if (rawCancelButtonColor) {
+            cropVC.cancelButtonColor = [ImageCropPicker colorFromHexString: rawCancelButtonColor];
+        }
         
         cropVC.doneButtonTitle = [self.options objectForKey:@"cropperChooseText"];
         cropVC.cancelButtonTitle = [self.options objectForKey:@"cropperCancelText"];
+        cropVC.rotateButtonsHidden = [[self.options objectForKey:@"cropperRotateButtonsHidden"] boolValue];
         
-        cropVC.modalPresentationStyle = UIModalPresentationFullScreen;\
+        cropVC.modalPresentationStyle = UIModalPresentationFullScreen;
+        if (@available(iOS 15.0, *)) {
+            cropVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        }
         
         [[self getRootVC] presentViewController:cropVC animated:FALSE completion:nil];
     });
