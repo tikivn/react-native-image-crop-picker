@@ -265,14 +265,6 @@ declare module "react-native-image-crop-picker" {
     cropperChooseText?: string;
 
     /**
-     * Whether to show the 3x3 grid on top of the image during cropping.
-     *
-     * @platform Android only
-     * @default true
-     */
-    showCropGuidelines?: boolean;
-
-    /**
      * Whether to show the square crop frame during cropping
      *
      * @platform Android only
@@ -287,6 +279,37 @@ declare module "react-native-image-crop-picker" {
      * @default false
      */
     enableRotationGesture?: boolean;
+        /**
+         * Cancel button color. HEX-like string color.
+         *
+         * @example '#ff00ee'
+         * @platform iOS only
+         */
+        cropperCancelColor?: string;
+
+        /**
+         * Choose button color. HEX-like string color.
+         *
+         * @example '#EE00DD'
+         * @platform iOS only
+         */
+        cropperChooseColor?: string;
+
+         /**
+         * Enable or disable cropper rotate buttons.
+         *
+         * @platform iOS only
+         * @default false
+         */
+          cropperRotateButtonsHidden?: boolean
+
+        /**
+         * Whether to show the 3x3 grid on top of the image during cropping.
+         *
+         * @platform Android only
+         * @default true
+         */
+        showCropGuidelines?: boolean;
 
     /**
      * When cropping image, disables the color setters for cropping library.
@@ -394,7 +417,6 @@ declare module "react-native-image-crop-picker" {
      * @platform iOS only
      */
     localIdentifier?: string;
-
     /**
      * Selected image's source path, do not have write access.
      *

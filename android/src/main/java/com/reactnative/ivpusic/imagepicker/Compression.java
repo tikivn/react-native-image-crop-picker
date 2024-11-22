@@ -3,11 +3,11 @@ package com.reactnative.ivpusic.imagepicker;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.util.Log;
+import android.util.Pair;
 
 import com.abedelazizshe.lightcompressorlibrary.CompressionListener;
 import com.abedelazizshe.lightcompressorlibrary.VideoCompressor;
